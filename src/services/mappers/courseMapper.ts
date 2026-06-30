@@ -11,7 +11,7 @@ export const mapCourseResponseToCourse = (dto: Course, isOwner: boolean): StoreC
 });
 
 const getParticipantRole = (participant: Participant) =>
-  participant.ParticipantRole;
+  participant.ParticipantRole ?? participant.participantRole;
 
 const getParticipantUserId = (participant: Participant) =>
   participant.userId ?? participant.id ?? participant.user?.id;

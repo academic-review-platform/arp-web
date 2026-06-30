@@ -1,11 +1,12 @@
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
-import { useState, type ReactNode } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 
 export interface ActionMenuItem {
   label: string;
   icon?: ReactNode;
   danger?: boolean;
+  disabled?: boolean;
   dividerBefore?: boolean;
   onClick?: () => void;
 }
@@ -46,20 +47,22 @@ const ActionMenuButton = ({ label, items }: ActionMenuButtonProps) => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {items.map((item) => [
-          item.dividerBefore ? <Divider key={`${item.label}-divider`} /> : null,
-          <MenuItem
-            key={item.label}
-            onClick={() => {
-              item.onClick?.();
-              closeMenu();
-            }}
-            sx={item.danger ? { color: 'error.main' } : undefined}
-          >
-            {item.icon && <ListItemIcon sx={item.danger ? { color: 'error.main' } : undefined}>{item.icon}</ListItemIcon>}
-            <ListItemText>{item.label}</ListItemText>
-          </MenuItem>,
-        ])}
+        {items.map((item) => (
+          <Fragment key={item.label}>
+            {item.dividerBefore && <Divider />}
+            <MenuItem
+              disabled={item.disabled}
+              onClick={() => {
+                item.onClick?.();
+                closeMenu();
+              }}
+              sx={item.danger ? { color: 'error.main' } : undefined}
+            >
+              {item.icon && <ListItemIcon sx={item.danger ? { color: 'error.main' } : undefined}>{item.icon}</ListItemIcon>}
+              <ListItemText>{item.label}</ListItemText>
+            </MenuItem>
+          </Fragment>
+        ))}
       </Menu>
     </>
   );

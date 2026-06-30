@@ -2,6 +2,7 @@
 export interface Submission {
   id: string;
   assignmentId: string;
+  documentId?: string;
   createdAt: string;
   updatedAt: string;
   document: SubmissionDocument;
@@ -10,6 +11,20 @@ export interface Submission {
 
 export interface SubmissionDocument {
   id: string;
+  userId?: string;
+  ownerId?: string;
+  user?: {
+    id?: string;
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+  };
+  owner?: {
+    id?: string;
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+  };
   currentVersionId: string;
   createdAt: string;
   updatedAt: string;
