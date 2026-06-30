@@ -2,11 +2,20 @@ import { Alert, Box, CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 
 import TopicContentSection from '../../components/topics/TopicContentSection';
+import { useTopicActions } from '../../hooks/useTopicActions';
 import { useTopicDetail } from '../../hooks/useTopicDetail';
 
 const TopicDetailPage = () => {
   const { courseId, topicId } = useParams();
-  const { detail, isOwner, isLoading, error } = useTopicDetail(courseId, topicId);
+  const { detail, courseBibliographies, isOwner, isLoading, error, refetch } = useTopicDetail(courseId, topicId);
+
+  const actions = useTopicActions({
+    topicId: topicId ?? '',
+    sessions: detail?.sessions ?? [],
+    topicBibliographies: detail?.bibliographies ?? [],
+    courseBibliographies,
+    onRefresh: refetch,
+  });
 
   if (isLoading) {
     return (
@@ -34,7 +43,11 @@ const TopicDetailPage = () => {
 
   return (
     <Box sx={{ pb: 4 }}>
-      <TopicContentSection detail={detail} isOwner={isOwner} />
+      <TopicContentSection
+        detail={detail}
+        isOwner={isOwner}
+        actions={actions}
+      />
     </Box>
   );
 };

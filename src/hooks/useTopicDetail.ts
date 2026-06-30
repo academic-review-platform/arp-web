@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { getCourseParticipants } from '../services/courseService';
+import { getCourseBibliographies, getCourseParticipants } from '../services/courseService';
 import { isCourseOwner } from '../services/mappers/courseMapper';
 import type { Assignment } from '../services/models/assignmentModels';
 import type { Bibliography } from '../services/models/bibliographyModels';
@@ -19,6 +19,7 @@ import type { TopicDetailContent } from './useCourseDetail';
 
 interface UseTopicDetailReturn {
   detail: TopicDetailContent | null;
+  courseBibliographies: Bibliography[];
   isOwner: boolean;
   isLoading: boolean;
   error: string | null;
@@ -40,6 +41,7 @@ export const useTopicDetail = (courseId?: string, topicId?: string): UseTopicDet
   const [sessions, setSessions] = useState<Session[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [bibliographies, setBibliographies] = useState<Bibliography[]>([]);
+  const [courseBibliographies, setCourseBibliographies] = useState<Bibliography[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [isOwner, setIsOwner] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,6 +63,7 @@ export const useTopicDetail = (courseId?: string, topicId?: string): UseTopicDet
           sessionsResponse,
           assignmentsResponse,
           bibliographiesResponse,
+          courseBibliographiesResponse,
           notesResponse,
           participantsResponse,
         ] = await Promise.all([
@@ -68,6 +71,7 @@ export const useTopicDetail = (courseId?: string, topicId?: string): UseTopicDet
           getTopicSessions(topicId),
           getTopicAssignments(topicId),
           getTopicBibliographies(topicId),
+          getCourseBibliographies(courseId),
           getHydratedTopicNotes(topicId),
           getCourseParticipants(courseId),
         ]);
@@ -78,6 +82,7 @@ export const useTopicDetail = (courseId?: string, topicId?: string): UseTopicDet
         setSessions(sessionsResponse);
         setAssignments(assignmentsResponse);
         setBibliographies(bibliographiesResponse);
+        setCourseBibliographies(courseBibliographiesResponse);
         setNotes(notesResponse);
         setIsOwner(isCourseOwner(participantsResponse, currentUser));
       } catch {
@@ -98,6 +103,7 @@ export const useTopicDetail = (courseId?: string, topicId?: string): UseTopicDet
 
   return {
     detail: topic ? { topic, sessions, assignments, bibliographies, notes } : null,
+    courseBibliographies,
     isOwner,
     isLoading,
     error: courseId && topicId ? error : 'No se encontró el topic solicitado.',
