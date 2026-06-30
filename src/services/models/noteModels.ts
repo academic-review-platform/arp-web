@@ -1,15 +1,38 @@
 // Note Models
 export interface Note {
-  id: string;
+  id?: string;
+  documentId: string;
   topicId: string;
+  userId?: string;
+  user?: {
+    id?: string;
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+  };
   createdAt: string;
   updatedAt: string;
-  document: NoteDocument;
-  currentVersion: NoteVersion;
+  deletedAt?: string | null;
+  document?: NoteDocument;
+  currentVersion?: NoteVersion;
 }
 
 export interface NoteDocument {
   id: string;
+  userId?: string;
+  ownerId?: string;
+  user?: {
+    id?: string;
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+  };
+  owner?: {
+    id?: string;
+    firstname?: string;
+    lastname?: string;
+    email?: string;
+  };
   currentVersionId: string;
   createdAt: string;
   updatedAt: string;
@@ -20,9 +43,11 @@ export interface NoteVersion {
   documentId: string;
   url: string;
   mimeType: string;
-  version: number;
+  version?: number;
+  versionNumber?: number;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 }
 
 export interface CreateNoteRequest {
