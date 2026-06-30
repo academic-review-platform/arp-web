@@ -1,5 +1,5 @@
 import { Box, Chip, Stack, Typography } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,7 +19,7 @@ import ActionMenuButton, { type ActionMenuItem } from '../common/ActionMenuButto
 import NoteUploadModal from '../notes/NoteUploadModal';
 import SessionFormModal from '../sessions/SessionFormModal';
 import TopicFormModal from './TopicFormModal';
-import { buildTopicRoute } from '../../constants/routes.constants';
+import { buildTopicRoute, buildSessionRoute, buildNoteRoute, buildTaskRoute } from '../../constants/routes.constants';
 import type { UseTopicActionsReturn } from '../../hooks/useTopicActions';
 import type { TopicDetailContent } from '../../hooks/useCourseDetail';
 import type { Assignment } from '../../services/models/assignmentModels';
@@ -47,6 +47,7 @@ type TimelineItem = {
   menuItems: ActionMenuItem[];
   footer?: React.ReactNode;
   actionLabel: string;
+  onClick?: () => void;
 };
 
 const sortByNewestDate = (items: TimelineItem[]) =>
@@ -88,6 +89,7 @@ const TopicContentSection = ({
   actions,
 }: TopicContentSectionProps) => {
   const { topic, sessions, assignments, bibliographies, notes } = detail;
+  const navigate = useNavigate();
   const {
     modal,
     isLoading,
@@ -250,8 +252,17 @@ const TopicContentSection = ({
       variant: 'session' as const,
       menuItems: isOwner ? buildOwnerSessionMenuItems(session) : [],
       actionLabel: 'Opciones de sesión',
+      onClick: courseId ? () => navigate(buildSessionRoute(courseId, topic.id, session.id)) : undefined,
     })),
-    ...assignments.map((assignment) => ({
+    ...assignments
+      .filter((assignment) => {
+        if (isOwner) return true;
+        // Students don't see drafts or assignments that haven't started yet
+        if (assignment.assignmentStatus === 'DRAFT') return false;
+        if (new Date(assignment.startDate) > new Date()) return false;
+        return true;
+      })
+      .map((assignment) => ({
       id: `assignment-${assignment.id}`,
       title: assignment.title,
       description: assignment.description,
@@ -261,16 +272,18 @@ const TopicContentSection = ({
       menuItems: isOwner ? buildOwnerAssignmentMenuItems(assignment) : [],
       footer: renderAssignmentReferences(assignment),
       actionLabel: 'Opciones de tarea',
+      onClick: courseId ? () => navigate(buildTaskRoute(courseId, topic.id, assignment.id)) : undefined,
     })),
     ...(!isOwner
       ? notes.map((note) => ({
           id: `note-${note.documentId}`,
           title: getNoteDisplayTitle(topic.title, note),
-          description: note.currentVersion?.mimeType ?? 'Documento sin versión disponible',
+          description: `Actualizado: ${new Date(note.currentVersion?.updatedAt ?? note.updatedAt).toLocaleString()}`,
           date: note.updatedAt,
           variant: 'note' as const,
           menuItems: buildStudentNoteMenuItems(note),
           actionLabel: 'Opciones de nota',
+          onClick: courseId ? () => navigate(buildNoteRoute(courseId, topic.id, note.documentId)) : undefined,
         }))
       : []),
   ]);
@@ -373,6 +386,7 @@ const TopicContentSection = ({
                   menuItems={item.menuItems}
                   footer={item.footer}
                   actionLabel={item.actionLabel}
+                  onClick={item.onClick}
                 />
               ))
             ) : (
@@ -396,6 +410,9 @@ const TopicContentSection = ({
                     label={getNoteDisplayTitle(topic.title, note)}
                     size="small"
                     variant="outlined"
+                    component={courseId ? RouterLink : 'div'}
+                    to={courseId ? buildNoteRoute(courseId, topic.id, note.documentId) : undefined}
+                    clickable={Boolean(courseId)}
                     onDelete={() => undefined}
                     deleteIcon={
                       <Box component="span" onClick={(event) => event.stopPropagation()}>
