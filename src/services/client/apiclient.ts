@@ -3,8 +3,14 @@ import { useAuthStore } from "../../store/authStore";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 
+// Default timeout for all requests (30 s).
+// AI review endpoints override this with LONG_TIMEOUT via per-request config.
+export const DEFAULT_TIMEOUT = 30_000;
+export const LONG_TIMEOUT = 120_000;
+
 const apiClient = axios.create({
   baseURL,
+  timeout: DEFAULT_TIMEOUT,
   headers: {
     "Content-Type": "application/json",
   },

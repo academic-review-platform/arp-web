@@ -17,9 +17,11 @@ interface NoteUploadModalProps {
   formik: FormikProps<NoteUploadFormValues>;
   isLoading: boolean;
   onClose: () => void;
+  title?: string;
+  submitLabel?: string;
 }
 
-const NoteUploadModal = ({ open, mode, formik, isLoading, onClose }: NoteUploadModalProps) => {
+const NoteUploadModal = ({ open, mode, formik, isLoading, onClose, title, submitLabel }: NoteUploadModalProps) => {
   const isEdit = mode === 'edit';
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,7 +41,7 @@ const NoteUploadModal = ({ open, mode, formik, isLoading, onClose }: NoteUploadM
         disabled={isLoading || !formik.isValid}
         startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : null}
       >
-        {isEdit ? 'Actualizar' : 'Publicar'}
+        {submitLabel ?? (isEdit ? 'Actualizar' : 'Publicar')}
       </Button>
     </>
   );
@@ -47,7 +49,7 @@ const NoteUploadModal = ({ open, mode, formik, isLoading, onClose }: NoteUploadM
   return (
     <AppModal
       open={open}
-      title={isEdit ? 'Editar Nota' : 'Publicar Apunte'}
+      title={title ?? (isEdit ? 'Editar Nota' : 'Publicar Apunte')}
       onClose={onClose}
       disableClose={isLoading}
       maxWidth="xs"

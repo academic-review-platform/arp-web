@@ -3,6 +3,12 @@ import type { Review } from "./models/reviewModels";
 
 const url = '/reviews';
 
+const hasResponseStatus = (error: unknown, status: number) =>
+  typeof error === 'object' &&
+  error !== null &&
+  'response' in error &&
+  (error as { response?: { status?: number } }).response?.status === status;
+
 export const getReviewById = async (reviewId: string): Promise<Review> => {
   try {
     const res = await apiClient.get(`${url}/${reviewId}`);
@@ -50,7 +56,9 @@ export const getReviewsByAssignment = async (assignmentId: string): Promise<Revi
     const res = await apiClient.get(`${url}/assignment/${assignmentId}`);
     return res.data.data;
   } catch (error) {
-    console.error('Error fetching reviews by assignment:', error);
+    if (!hasResponseStatus(error, 403)) {
+      console.error('Error fetching reviews by assignment:', error);
+    }
     throw error;
   }
 };

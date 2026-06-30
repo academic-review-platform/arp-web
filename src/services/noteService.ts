@@ -1,4 +1,4 @@
-import apiClient from "./client/apiclient";
+import apiClient, { LONG_TIMEOUT } from "./client/apiclient";
 import type { Note, CreateNoteRequest, UpdateNoteRequest } from "./models/noteModels";
 import type { Review, CreateReviewRequest } from "./models/reviewModels";
 
@@ -65,6 +65,27 @@ export const deleteNote = async (topicId: string, documentId: string): Promise<v
   }
 };
 
+export const downloadNote = async (documentId: string): Promise<void> => {
+  try {
+    const res = await apiClient.get(`/topics/download/${documentId}`, {
+      maxRedirects: 0,
+      validateStatus: (status) => status >= 200 && status < 400,
+    });
+
+    const redirectUrl =
+      res.request?.responseURL ??
+      res.headers.location ??
+      (typeof res.data === 'string' ? res.data : undefined);
+
+    if (redirectUrl) {
+      window.open(redirectUrl, '_blank', 'noopener,noreferrer');
+    }
+  } catch (error) {
+    console.error('Error downloading note:', error);
+    throw error;
+  }
+};
+
 export const createNoteReview = async (
   topicId: string,
   documentId: string,
@@ -84,7 +105,11 @@ export const createNoteReview = async (
 
 export const createNoteReviewAI = async (topicId: string, documentId: string): Promise<Review> => {
   try {
-    const res = await apiClient.post(`/topics/${topicId}/notes/${documentId}/reviews/ai`);
+    const res = await apiClient.post(
+      `/topics/${topicId}/notes/${documentId}/reviews/ai`,
+      undefined,
+      { timeout: LONG_TIMEOUT },
+    );
     return res.data.data;
   } catch (error) {
     console.error('Error creating AI note review:', error);

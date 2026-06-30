@@ -36,7 +36,7 @@ import {
   createAssignmentBibliography as createAssignmentBibliographyService,
   deleteBibliography,
 } from '../services/bibliographyService';
-import { createNote, createNoteReviewAI, deleteNote, updateNote } from '../services/noteService';
+import { createNote, createNoteReviewAI, deleteNote, downloadNote as downloadNoteFile, updateNote } from '../services/noteService';
 import {
   createSession,
   deleteSession,
@@ -189,10 +189,10 @@ export const useTopicActions = ({
   const openEditNote = (note: Note) => setModal({ kind: 'editNote', note });
   const openDeleteNote = (note: Note) => setModal({ kind: 'deleteNote', note });
   const openAiReviewNote = (note: Note) => setModal({ kind: 'aiReviewNote', note });
-  const downloadNote = (note: Note) => {
-    const url = note.currentVersion?.url;
-    if (url) window.open(url, '_blank', 'noopener,noreferrer');
-  };
+  const downloadNote = (note: Note) =>
+    run(async () => {
+      await downloadNoteFile(note.document?.id ?? note.documentId ?? note.currentVersion?.documentId);
+    });
 
   // ── Async actions ──────────────────────────────────────────────────────────
 

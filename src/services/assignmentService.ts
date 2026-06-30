@@ -1,4 +1,4 @@
-import apiClient from "./client/apiclient";
+import apiClient, { LONG_TIMEOUT } from "./client/apiclient";
 import type {
   Assignment,
   CreateAssignmentRequest,
@@ -142,6 +142,18 @@ export const deleteSubmission = async (assignmentId: string, documentId: string)
   }
 };
 
+export const downloadSubmission = async (documentId: string): Promise<Blob> => {
+  try {
+    const res = await apiClient.get(`${url}/download/${documentId}`, {
+      responseType: 'blob',
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Error downloading submission:', error);
+    throw error;
+  }
+};
+
 // ── Submission Reviews ────────────────────────────────────────────────────────
 
 export const createSubmissionReview = async (
@@ -167,7 +179,9 @@ export const createSubmissionReviewAI = async (
 ): Promise<Review> => {
   try {
     const res = await apiClient.post(
-      `${url}/${assignmentId}/submissions/${documentId}/reviews/ai`
+      `${url}/${assignmentId}/submissions/${documentId}/reviews/ai`,
+      undefined,
+      { timeout: LONG_TIMEOUT },
     );
     return res.data.data;
   } catch (error) {
