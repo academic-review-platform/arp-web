@@ -7,7 +7,7 @@ import { useDashboard } from '../hooks/useDashboard';
 import { useDashboardActions } from '../hooks/useDashboardActions';
 
 const DashboardPage = () => {
-  const { ownedCourses, enrolledCourses, currentUserId, isLoading, error } = useDashboard();
+  const { ownedCourses, enrolledCourses, isLoading, error } = useDashboard();
   const actions = useDashboardActions();
 
   if (isLoading) {
@@ -42,7 +42,7 @@ const DashboardPage = () => {
 
           <Grid container spacing={2}>
             {allCourses.map((course) => {
-              const isOwner = course.ownerId === currentUserId;
+              const isOwner = course.isOwner;
               return (
                 <Grid key={course.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                   <CourseCard

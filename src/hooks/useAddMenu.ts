@@ -4,8 +4,8 @@ import { useFormik } from 'formik';
 import { createCourseSchema } from './schemas/createCourseSchema';
 import { enrollCourseSchema } from './schemas/enrollCourseSchema';
 import { createCourse, enrollInCourse } from '../services/courseService';
+import { mapCourseResponseToCourse } from '../services/mappers/courseMapper';
 import { useCourseStore } from '../store/courseStore';
-import type { Course } from '../store/models/courseStoreModels';
 
 type ActiveModal = 'none' | 'create' | 'enroll';
 
@@ -71,13 +71,7 @@ export const useAddMenu = (): UseAddMenuReturn => {
       setIsCreating(true);
       try {
         const res = await createCourse(values);
-        const course: Course = {
-          id: res.id,
-          name: res.title,
-          description: res.description ?? '',
-          enrollmentCode: res.enrollmentCode,
-          ownerId: res.ownerId,
-        };
+        const course = mapCourseResponseToCourse(res, true);
         await addOwnedCourse(course);
         helpers.resetForm();
         closeModal();
@@ -97,12 +91,12 @@ export const useAddMenu = (): UseAddMenuReturn => {
       setIsEnrolling(true);
       try {
         const res = await enrollInCourse(values);
-        const course: Course = {
+        const course = {
           id: res.courseId,
           name: res.courseId,
           description: '',
           enrollmentCode: '',
-          ownerId: res.userId,
+          isOwner: res.participantRole === 'OWNER',
         };
         await addEnrolledCourse(course);
         helpers.resetForm();
