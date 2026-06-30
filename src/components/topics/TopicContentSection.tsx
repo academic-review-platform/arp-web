@@ -370,6 +370,63 @@ const TopicContentSection = ({
           ))}
         </Stack>
 
+        {isOwner && (
+          <Box sx={{ mt: 1.5 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.75 }}>
+              Apuntes de estudiantes
+            </Typography>
+            <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+              {notes.length > 0 ? (
+                notes.map((note) => {
+                  const noteRoute = courseId
+                    ? buildNoteRoute(courseId, topic.id, note.documentId)
+                    : undefined;
+                  return (
+                    <Box
+                      key={note.documentId}
+                      sx={{ display: 'inline-flex', alignItems: 'center' }}
+                    >
+                      <Chip
+                        label={
+                          noteRoute ? (
+                            <RouterLink
+                              to={noteRoute}
+                              style={{ color: 'inherit', textDecoration: 'none' }}
+                            >
+                              {getNoteDisplayTitle(topic.title, note)}
+                            </RouterLink>
+                          ) : (
+                            getNoteDisplayTitle(topic.title, note)
+                          )
+                        }
+                        size="small"
+                        variant="outlined"
+                        onDelete={() => undefined}
+                        deleteIcon={
+                          <Box
+                            component="span"
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                          >
+                            <ActionMenuButton
+                              label="Opciones de nota"
+                              items={buildOwnerNoteMenuItems(note)}
+                            />
+                          </Box>
+                        }
+                      />
+                    </Box>
+                  );
+                })
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  Sin apuntes publicados.
+                </Typography>
+              )}
+            </Stack>
+          </Box>
+        )}
+
         <Box sx={{ mt: 3 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
             Publicaciones
@@ -397,41 +454,6 @@ const TopicContentSection = ({
           </Stack>
         </Box>
 
-        {isOwner && (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
-              Notas de estudiantes
-            </Typography>
-            <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
-              {notes.length > 0 ? (
-                notes.map((note) => (
-                  <Chip
-                    key={note.documentId}
-                    label={getNoteDisplayTitle(topic.title, note)}
-                    size="small"
-                    variant="outlined"
-                    component={courseId ? RouterLink : 'div'}
-                    to={courseId ? buildNoteRoute(courseId, topic.id, note.documentId) : undefined}
-                    clickable={Boolean(courseId)}
-                    onDelete={() => undefined}
-                    deleteIcon={
-                      <Box component="span" onClick={(event) => event.stopPropagation()}>
-                        <ActionMenuButton
-                          label="Opciones de nota"
-                          items={buildOwnerNoteMenuItems(note)}
-                        />
-                      </Box>
-                    }
-                  />
-                ))
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  {emptyText}
-                </Typography>
-              )}
-            </Stack>
-          </Box>
-        )}
       </Box>
 
       {/* ── Modals ──────────────────────────────────────────────────────── */}
