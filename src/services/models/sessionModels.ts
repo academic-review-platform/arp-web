@@ -10,7 +10,6 @@ export interface Session {
 }
 
 export interface CreateSessionRequest {
-  topicId: string;
   title: string;
   summary: string;
   contentMd: string;

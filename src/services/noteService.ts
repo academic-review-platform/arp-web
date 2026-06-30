@@ -17,7 +17,13 @@ export const createNote = async (
   noteData: CreateNoteRequest
 ): Promise<Note> => {
   try {
-    const res = await apiClient.post(`/topics/${topicId}/notes`, noteData);
+    const formData = new FormData();
+    formData.append('url', noteData.url);
+    formData.append('mimeType', noteData.mimeType);
+    if (noteData.file) formData.append('file', noteData.file);
+    const res = await apiClient.post(`/topics/${topicId}/notes`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return res.data.data;
   } catch (error) {
     console.error('Error creating note:', error);
@@ -38,14 +44,13 @@ export const getNoteById = async (topicId: string, documentId: string): Promise<
 export const updateNote = async (
   topicId: string,
   documentId: string,
-  noteData: UpdateNoteRequest & { file?: File }
+  noteData: UpdateNoteRequest
 ): Promise<Note> => {
   try {
     const formData = new FormData();
     formData.append('url', noteData.url);
     formData.append('mimeType', noteData.mimeType);
     if (noteData.file) formData.append('file', noteData.file);
-
     const res = await apiClient.put(`/topics/${topicId}/notes/${documentId}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

@@ -53,9 +53,11 @@ export interface NoteVersion {
 export interface CreateNoteRequest {
   url: string;
   mimeType: string;
+  file?: File;
 }
 
 export interface UpdateNoteRequest {
   url: string;
   mimeType: string;
+  file?: File;
 }

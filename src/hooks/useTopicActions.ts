@@ -433,10 +433,7 @@ export const useTopicActions = ({
       setIsLoading(true);
       try {
         if (modal.kind === 'publishNote') {
-          await createNote(topicId, {
-            url: '',
-            mimeType: values.file.type,
-          });
+          await createNote(topicId, { url: '', mimeType: values.file.type, file: values.file });
         } else if (modal.kind === 'editNote') {
           await updateNote(topicId, modal.note.documentId, {
             url: modal.note.currentVersion?.url ?? '',

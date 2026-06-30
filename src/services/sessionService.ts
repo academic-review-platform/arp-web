@@ -34,7 +34,11 @@ export const deleteSession = async (sessionId: string): Promise<void> => {
 
 export const createSession = async (topicId: string, sessionData: CreateSessionRequest): Promise<Session> => {
   try {
-    const res = await apiClient.post(`/topics/${topicId}/sessions`, sessionData);
+    const res = await apiClient.post(`/topics/${topicId}/sessions`, {
+      title: sessionData.title,
+      summary: sessionData.summary,
+      contentMd: sessionData.contentMd
+    });
     return res.data.data;
   } catch (error) {
     console.error('Error creating session:', error);

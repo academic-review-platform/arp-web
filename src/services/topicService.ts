@@ -1,7 +1,7 @@
 import apiClient from "./client/apiclient";
 import type { Topic, CreateTopicRequest, UpdateTopicRequest } from "./models/topicModels";
 import type { Session, CreateSessionRequest } from "./models/sessionModels";
-import type { Note, CreateNoteRequest } from "./models/noteModels";
+import type { Note } from "./models/noteModels";
 import type { Assignment, CreateAssignmentRequest } from "./models/assignmentModels";
 import type { Bibliography, CreateBibliographyRequest } from "./models/bibliographyModels";
 
@@ -79,18 +79,6 @@ export const getTopicNotes = async (topicId: string): Promise<Note[]> => {
   }
 };
 
-export const createTopicNote = async (
-  topicId: string,
-  noteData: CreateNoteRequest
-): Promise<Note> => {
-  try {
-    const res = await apiClient.post(`${url}/${topicId}/notes`, noteData);
-    return res.data.data;
-  } catch (error) {
-    console.error('Error creating topic note:', error);
-    throw error;
-  }
-};
 
 export const getTopicAssignments = async (topicId: string): Promise<Assignment[]> => {
   try {
