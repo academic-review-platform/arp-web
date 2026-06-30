@@ -4,7 +4,6 @@ export interface Course {
   title: string;
   description?: string;
   enrollmentCode: string;
-  ownerId: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,8 +30,16 @@ export interface EnrollResponse {
 }
 
 export interface Participant {
-  userId: string;
+  courseId?: string;
+  id?: string;
+  userId?: string;
+  user?: {
+    id?: string;
+    email?: string;
+  };
+  email?: string;
   firstname: string;
   lastname: string;
-  participantRole: 'STUDENT' | 'TEACHER' | 'ASSISTANT' | 'OWNER';
+  participantRole?: 'STUDENT' | 'TEACHER' | 'ASSISTANT' | 'OWNER';
+  ParticipantRole?: 'STUDENT' | 'TEACHER' | 'ASSISTANT' | 'OWNER';
 }

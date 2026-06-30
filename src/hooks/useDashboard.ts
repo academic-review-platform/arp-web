@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { getCourses } from '../services/courseService';
+import { getCourseParticipants, getCourses } from '../services/courseService';
 import { partitionCourses } from '../services/mappers/courseMapper';
 import { useAuthStore } from '../store/authStore';
 import { useCourseStore } from '../store/courseStore';
@@ -9,14 +9,13 @@ import type { Course } from '../store/models/courseStoreModels';
 export interface UseDashboardReturn {
   ownedCourses: Course[];
   enrolledCourses: Course[];
-  currentUserId: string;
   isLoading: boolean;
   error: string | null;
   refetch: () => void;
 }
 
 export const useDashboard = (): UseDashboardReturn => {
-  const currentUserId = useAuthStore((state) => state.user.id);
+  const currentUser = useAuthStore((state) => state.user);
   const setCourses      = useCourseStore((state) => state.setCourses);
   const ownedCourses    = useCourseStore((state) => state.ownedCourses);
   const enrolledCourses = useCourseStore((state) => state.enrolledCourses);
@@ -33,8 +32,17 @@ export const useDashboard = (): UseDashboardReturn => {
       setError(null);
       try {
         const dtos = await getCourses();
+        const participants = await Promise.all(
+          dtos.map(async (course) => {
+            const courseParticipants = await getCourseParticipants(course.id);
+            return courseParticipants.map((participant) => ({
+              ...participant,
+              courseId: course.id,
+            }));
+          }),
+        );
         if (cancelled) return;
-        const { owned, enrolled } = partitionCourses(dtos, currentUserId);
+        const { owned, enrolled } = partitionCourses(dtos, currentUser, participants.flat());
         setCourses(owned, enrolled);
       } catch {
         if (!cancelled) setError('No se pudieron cargar los cursos.');
@@ -46,11 +54,9 @@ export const useDashboard = (): UseDashboardReturn => {
     fetchCourses();
 
     return () => { cancelled = true; };
-  // fetchTick permite forzar un re-fetch desde fuera llamando refetch()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchTick]);
+  }, [currentUser, fetchTick, setCourses]);
 
   const refetch = () => setFetchTick((t) => t + 1);
 
-  return { ownedCourses, enrolledCourses, currentUserId, isLoading, error, refetch };
+  return { ownedCourses, enrolledCourses, isLoading, error, refetch };
 };

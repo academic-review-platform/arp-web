@@ -3,7 +3,7 @@ export interface Course {
   name: string;
   description: string;
   enrollmentCode: string;
-  ownerId: string;
+  isOwner: boolean;
 }
 
 export interface CourseStoreInterface {

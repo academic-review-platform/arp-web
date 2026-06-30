@@ -7,6 +7,7 @@ import {
   deleteCourse as deleteCourseService,
   unenrollFromCourse as unenrollFromCourseService,
 } from '../services/courseService';
+import { mapCourseResponseToCourse } from '../services/mappers/courseMapper';
 import { useCourseStore } from '../store/courseStore';
 import type { Course } from '../store/models/courseStoreModels';
 
@@ -76,13 +77,7 @@ export const useDashboardActions = (): UseDashboardActionsReturn => {
       setIsEditing(true);
       try {
         const res = await updateCourseService(selectedCourse.id, values);
-        const updated: Course = {
-          id: res.id,
-          name: res.title,
-          description: res.description ?? '',
-          enrollmentCode: res.enrollmentCode,
-          ownerId: res.ownerId,
-        };
+        const updated = mapCourseResponseToCourse(res, selectedCourse.isOwner);
         await storeUpdateCourse(updated.id, updated);
         closeModal();
       } catch {
