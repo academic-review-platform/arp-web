@@ -11,6 +11,9 @@ export interface Assignment {
   assignmentStatus: AssignmentStatus;
   createdAt: string;
   updatedAt: string;
+  bibliographies?: AssignmentBibliographyReference[];
+  sessionReferences?: AssignmentSessionReference[];
+  references?: AssignmentSessionReference[];
 }
 
 export interface CreateAssignmentRequest {
@@ -32,5 +35,13 @@ export interface UpdateAssignmentRequest {
 export interface AssignmentSessionReference {
   assignmentId: string;
   sessionId: string;
+  title?: string;
   createdAt: string;
+}
+
+export interface AssignmentBibliographyReference {
+  assignmentId?: string;
+  bibliographyId: string;
+  title?: string;
+  createdAt?: string;
 }
