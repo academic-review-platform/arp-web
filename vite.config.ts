@@ -8,4 +8,12 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+  server: {
+    host: '0.0.0.0',
+    cors: true,
+  },
+  preview: {
+    host: '0.0.0.0',
+    cors: true,
+  },
 })
